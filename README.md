@@ -60,8 +60,13 @@ predict_disease(["fever", "cough", "fatigue"], top_k=3)
 The system generates:
 - `performance_summary.txt` - Performance metrics
 - `disease_prediction_results.png` - Visualizations
+- `Confusion Matrix.png` - Visualizations
+![alt text](image-1.png)
 - `attention_heatmap.png` - Attention analysis
+![alt text](image.png)
 - `top_symptoms_per_disease.png` - Feature importance
+![alt text](image-2.png)
+![alt text](image-3.png)
 
 ## Key Components
 
