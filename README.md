@@ -61,12 +61,15 @@ The system generates:
 - `performance_summary.txt` - Performance metrics
 - `disease_prediction_results.png` - Visualizations
 - `Confusion Matrix.png` - Visualizations
-![alt text](image-1.png)
+<img width="4561" height="3902" alt="4_confusion_matrix_full" src="https://github.com/user-attachments/assets/5c357267-e96b-49f2-baba-8a15cff79e69" />
 - `attention_heatmap.png` - Attention analysis
-![alt text](image.png)
+<img width="3832" height="2370" alt="7_attention_heatmap" src="https://github.com/user-attachments/assets/c7e44ccb-34ee-4abe-88b6-4308d576c0d4" />
+- `tsne_visualization`
+  <img width="4119" height="2970" alt="6_tsne_visualization" src="https://github.com/user-attachments/assets/e828eac5-76c5-4dcc-9b6d-39b3d66cff19" />
 - `top_symptoms_per_disease.png` - Feature importance
-![alt text](image-2.png)
-![alt text](image-3.png)
+!<img width="2969" height="1766" alt="8_1_AIDS_symptoms" src="https://github.com/user-attachments/assets/9c24b920-08ba-4959-958e-f991e08845bd" />
+<img width="2969" height="1766" alt="8_1_Tuberculosis_symptoms" src="https://github.com/user-attachments/assets/0a8c5885-3a25-4abe-9bec-a7d49bba11ed" />
+
 
 ## Key Components
 
