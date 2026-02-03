@@ -1,3 +1,4 @@
+# %%
 """
 Enhanced Disease Prediction System
 Multi-modal deep learning framework combining contrastive learning,
@@ -822,6 +823,8 @@ with open('performance_summary.txt', 'w', encoding='utf-8') as f:
 
 print("\nSummary saved to 'performance_summary.txt'")
 
+
+# %%
 # ============================================================================
 # VISUALIZATIONS
 # ============================================================================
@@ -830,79 +833,144 @@ print("\n" + "="*80)
 print("Generating Visualizations")
 print("="*80)
 
-fig = plt.figure(figsize=(20, 12))
-gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
+# Plot 1: Training Accuracy
+print("Creating training accuracy plot...")
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['accuracy'], label='Train', linewidth=2)
+plt.plot(history.history['val_accuracy'], label='Validation', linewidth=2)
+plt.title('Training Accuracy', fontsize=14, fontweight='bold')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('1_training_accuracy.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("Saved: 1_training_accuracy.png")
 
-# Training accuracy
-ax1 = fig.add_subplot(gs[0, 0])
-ax1.plot(history.history['accuracy'], label='Train', linewidth=2)
-ax1.plot(history.history['val_accuracy'], label='Validation', linewidth=2)
-ax1.set_title('Training Accuracy', fontsize=14, fontweight='bold')
-ax1.set_xlabel('Epoch')
-ax1.set_ylabel('Accuracy')
-ax1.legend()
-ax1.grid(True, alpha=0.3)
+# Plot 2: Training Loss
+print("Creating training loss plot...")
+plt.figure(figsize=(10, 6))
+plt.plot(history.history['loss'], label='Train', linewidth=2)
+plt.plot(history.history['val_loss'], label='Validation', linewidth=2)
+plt.title('Training Loss', fontsize=14, fontweight='bold')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('2_training_loss.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("Saved: 2_training_loss.png")
 
-# Training loss
-ax2 = fig.add_subplot(gs[0, 1])
-ax2.plot(history.history['loss'], label='Train', linewidth=2)
-ax2.plot(history.history['val_loss'], label='Validation', linewidth=2)
-ax2.set_title('Training Loss', fontsize=14, fontweight='bold')
-ax2.set_xlabel('Epoch')
-ax2.set_ylabel('Loss')
-ax2.legend()
-ax2.grid(True, alpha=0.3)
-
-# Top-K accuracy
-ax3 = fig.add_subplot(gs[0, 2])
+# Plot 3: Top-K Accuracy
+print("Creating top-k accuracy plot...")
 k_values = [1, 3, 5, 10]
 accuracies = [test_acc * 100] + [top_k_accuracy(y_test, y_pred_probs, k) * 100 
                                   for k in k_values[1:]]
-ax3.bar(k_values, accuracies, width=1.5, edgecolor='black', linewidth=1.5)
-ax3.set_title('Top-K Accuracy', fontsize=14, fontweight='bold')
-ax3.set_xlabel('K')
-ax3.set_ylabel('Accuracy (%)')
-ax3.set_ylim([0, 105])
-ax3.grid(True, alpha=0.3, axis='y')
+plt.figure(figsize=(10, 6))
+plt.bar(k_values, accuracies, width=1.5, edgecolor='black', linewidth=1.5)
+plt.title('Top-K Accuracy', fontsize=14, fontweight='bold')
+plt.xlabel('K')
+plt.ylabel('Accuracy (%)')
+plt.ylim([0, 105])
+plt.grid(True, alpha=0.3, axis='y')
 for i, (k, acc) in enumerate(zip(k_values, accuracies)):
-    ax3.text(k, acc + 2, f'{acc:.1f}%', ha='center', fontsize=10, fontweight='bold')
+    plt.text(k, acc + 2, f'{acc:.1f}%', ha='center', fontsize=10, fontweight='bold')
+plt.tight_layout()
+plt.savefig('3_topk_accuracy.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("Saved: 3_topk_accuracy.png")
 
-# Confusion matrix (top 10 diseases)
-ax4 = fig.add_subplot(gs[1, :2])
+# Plot 4: Confusion Matrix
+print("Creating confusion matrix...")
 cm = confusion_matrix(y_test, y_pred)
 disease_counts = pd.Series(y_test).value_counts().head(10)
 top_diseases_idx = disease_counts.index.tolist()
 cm_subset = cm[np.ix_(top_diseases_idx, top_diseases_idx)]
 top_disease_names = [le.classes_[i] for i in top_diseases_idx]
-sns.heatmap(cm_subset, annot=True, fmt='d', cmap='YlOrRd', xticklabels=top_disease_names,
-           yticklabels=top_disease_names, ax=ax4, cbar_kws={'label': 'Count'}, linewidths=0.5)
-ax4.set_title('Confusion Matrix (Top 10 Diseases)', fontsize=14, fontweight='bold')
-ax4.set_xlabel('Predicted')
-ax4.set_ylabel('Actual')
-plt.setp(ax4.get_xticklabels(), rotation=45, ha='right', fontsize=9)
 
-# Per-class performance
-ax5 = fig.add_subplot(gs[1, 2])
+plt.figure(figsize=(12, 10))
+sns.heatmap(cm_subset, annot=True, fmt='d', cmap='YlOrRd', 
+           xticklabels=top_disease_names, yticklabels=top_disease_names, 
+           cbar_kws={'label': 'Count'}, linewidths=0.5)
+plt.title('Confusion Matrix (Top 10 Diseases)', fontsize=14, fontweight='bold')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.xticks(rotation=45, ha='right', fontsize=9)
+plt.yticks(rotation=0, fontsize=9)
+plt.tight_layout()
+plt.savefig('4_confusion_matrix.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("Saved: 4_confusion_matrix.png")
+
+# Plot 4: Confusion Matrix (All Diseases)
+print("Creating confusion matrix for all diseases...")
+
+# 1. Compute the full confusion matrix
+cm = confusion_matrix(y_test, y_pred)
+
+# 2. Get all disease names from the LabelEncoder
+all_disease_names = le.classes_
+
+# 3. Adjust figure size dynamically based on the number of classes
+num_classes = len(all_disease_names)
+fig_size = max(12, num_classes * 0.4) # Scales size so labels don't overlap
+
+plt.figure(figsize=(fig_size, fig_size * 0.8))
+
+# 4. Create the heatmap
+sns.heatmap(
+    cm, 
+    annot=num_classes < 30, # Only show numbers if the matrix isn't too crowded
+    fmt='d', 
+    cmap='YlOrRd', 
+    xticklabels=all_disease_names, 
+    yticklabels=all_disease_names, 
+    cbar_kws={'label': 'Count'}, 
+    linewidths=0.1
+)
+
+plt.title(f'Full Confusion Matrix ({num_classes} Diseases)', fontsize=16, fontweight='bold')
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('Actual', fontsize=12)
+
+# Rotate labels for better readability
+plt.xticks(rotation=90, ha='center', fontsize=8)
+plt.yticks(rotation=0, fontsize=8)
+
+plt.tight_layout()
+plt.savefig('4_confusion_matrix_full.png', dpi=300, bbox_inches='tight')
+plt.close()
+
+print(f"Saved: 4_confusion_matrix_full.png - Processed {num_classes} classes.")
+
+# Plot 5: Per-Class Performance
+print("Creating per-class performance plot...")
 precision, recall, f1, support = precision_recall_fscore_support(y_test, y_pred)
 top_15_idx = np.argsort(support)[-15:][::-1]
 diseases_subset = [le.classes_[i][:15] for i in top_15_idx]
 x_pos = np.arange(len(diseases_subset))
 width = 0.25
-ax5.bar(x_pos - width, precision[top_15_idx], width, label='Precision', alpha=0.8)
-ax5.bar(x_pos, recall[top_15_idx], width, label='Recall', alpha=0.8)
-ax5.bar(x_pos + width, f1[top_15_idx], width, label='F1-Score', alpha=0.8)
-ax5.set_xlabel('Disease')
-ax5.set_ylabel('Score')
-ax5.set_title('Per-Class Performance (Top 15)', fontsize=14, fontweight='bold')
-ax5.set_xticks(x_pos)
-ax5.set_xticklabels(diseases_subset, rotation=45, ha='right', fontsize=8)
-ax5.legend(fontsize=9)
-ax5.grid(True, alpha=0.3, axis='y')
-ax5.set_ylim([0, 1.1])
 
-# t-SNE visualization
+plt.figure(figsize=(12, 8))
+plt.bar(x_pos - width, precision[top_15_idx], width, label='Precision', alpha=0.8)
+plt.bar(x_pos, recall[top_15_idx], width, label='Recall', alpha=0.8)
+plt.bar(x_pos + width, f1[top_15_idx], width, label='F1-Score', alpha=0.8)
+plt.xlabel('Disease')
+plt.ylabel('Score')
+plt.title('Per-Class Performance (Top 15 Diseases)', fontsize=14, fontweight='bold')
+plt.xticks(x_pos, diseases_subset, rotation=45, ha='right', fontsize=9)
+plt.legend(fontsize=10)
+plt.grid(True, alpha=0.3, axis='y')
+plt.ylim([0, 1.1])
+plt.tight_layout()
+plt.savefig('5_perclass_performance.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("Saved: 5_perclass_performance.png")
+
+# Plot 6: t-SNE Visualization
 print("Computing t-SNE projection...")
-ax6 = fig.add_subplot(gs[2, :])
 X_vis = np.hstack([X_contrastive_scaled, X_gnn_scaled, X_attention_scaled])
 sample_size = min(1000, len(X_vis))
 indices = np.random.choice(len(X_vis), sample_size, replace=False)
@@ -916,21 +984,23 @@ unique_labels = np.unique(labels_vis_sample)
 n_labels = len(unique_labels)
 colors = plt.cm.tab20(np.linspace(0, 1, n_labels))
 
+plt.figure(figsize=(14, 10))
 for i, label in enumerate(unique_labels):
     mask = labels_vis_sample == label
-    ax6.scatter(X_tsne[mask, 0], X_tsne[mask, 1], c=[colors[i]], 
+    plt.scatter(X_tsne[mask, 0], X_tsne[mask, 1], c=[colors[i]], 
                label=label, s=30, alpha=0.6, edgecolors='black', linewidth=0.3)
 
-ax6.set_title('t-SNE Visualization of Patient Embeddings', fontsize=14, fontweight='bold')
-ax6.set_xlabel('t-SNE Component 1')
-ax6.set_ylabel('t-SNE Component 2')
-ax6.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=8, ncol=2)
-ax6.grid(True, alpha=0.3)
+plt.title('t-SNE Visualization of Patient Embeddings', fontsize=14, fontweight='bold')
+plt.xlabel('t-SNE Component 1')
+plt.ylabel('t-SNE Component 2')
+plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=8, ncol=2)
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.savefig('6_tsne_visualization.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("Saved: 6_tsne_visualization.png")
 
-plt.savefig('disease_prediction_results.png', dpi=300, bbox_inches='tight')
-print("Visualizations saved to 'disease_prediction_results.png'")
-
-# Attention heatmap
+# Plot 7: Attention Heatmap
 print("\nGenerating attention heatmap...")
 max_symptoms = max(symptom_lists.apply(len))
 att_matrix = np.zeros((min(100, len(symptom_lists)), max_symptoms))
@@ -955,10 +1025,11 @@ plt.xlabel("Symptom Position")
 plt.ylabel("Patient Sample")
 plt.title("Attention Heatmap with Severity Weighting", fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig('attention_heatmap.png', dpi=300, bbox_inches='tight')
-print("Attention heatmap saved to 'attention_heatmap.png'")
+plt.savefig('7_attention_heatmap.png', dpi=300, bbox_inches='tight')
+plt.close()
+print("Saved: 7_attention_heatmap.png")
 
-# Top predictive symptoms per disease
+# Plots 8+: Top predictive symptoms per disease (separate file for each)
 print("\nAnalyzing top predictive symptoms...")
 selected_diseases = ['Tuberculosis', 'Pneumonia', 'Hepatitis B', 'GERD', 'Hypertension']
 top_k_symptoms = 5
@@ -992,23 +1063,321 @@ for disease in selected_diseases:
     top_symptoms_selected[disease] = [(unique_symptoms[i], symptom_scores[i]) 
                                        for i in top_idx_symptoms]
 
-fig, axes = plt.subplots(len(top_symptoms_selected), 1, figsize=(10, 3*len(top_symptoms_selected)))
-if len(top_symptoms_selected) == 1:
-    axes = [axes]
-
-for ax, (disease, top_symptoms) in zip(axes, top_symptoms_selected.items()):
+# Create separate plot for each disease
+for disease_num, (disease, top_symptoms) in enumerate(top_symptoms_selected.items(), 1):
+    plt.figure(figsize=(10, 6))
     symptoms, scores = zip(*top_symptoms)
-    ax.barh(symptoms[::-1], scores[::-1], edgecolor='black', linewidth=1.5)
-    ax.set_xlabel("Cumulative Attention Score", fontsize=11)
-    ax.set_title(f"Top-{top_k_symptoms} Predictive Symptoms: {disease}", 
-                fontsize=12, fontweight='bold')
-    ax.grid(True, alpha=0.3, axis='x')
+    
+    plt.barh(range(len(symptoms)), scores[::-1], edgecolor='black', linewidth=1.5)
+    plt.yticks(range(len(symptoms)), symptoms[::-1], fontsize=11)
+    plt.xlabel("Cumulative Attention Score", fontsize=11)
+    plt.title(f"Top-{top_k_symptoms} Predictive Symptoms: {disease}", 
+             fontsize=12, fontweight='bold')
+    plt.grid(True, alpha=0.3, axis='x')
+    plt.tight_layout()
+    
+    disease_filename = disease.replace(" ", "_").replace("/", "_")
+    plt.savefig(f'8_{disease_num}_{disease_filename}_symptoms.png', dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"Saved: 8_{disease_num}_{disease_filename}_symptoms.png")
 
-plt.tight_layout()
-plt.savefig('top_symptoms_per_disease.png', dpi=300, bbox_inches='tight')
-print("Top symptoms visualization saved to 'top_symptoms_per_disease.png'")
-
-print("\nAll visualizations generated successfully")
+print("\n" + "="*80)
+print("All Visualizations Generated Successfully")
+print("="*80)
+print("\nGenerated Files:")
+print("  1. 1_training_accuracy.png")
+print("  2. 2_training_loss.png")
+print("  3. 3_topk_accuracy.png")
+print("  4. 4_confusion_matrix.png")
+print("  5. 5_perclass_performance.png")
+print("  6. 6_tsne_visualization.png")
+print("  7. 7_attention_heatmap.png")
+print("  8. 8_1 to 8_5 (top symptoms for each disease)")
 print("\n" + "="*80)
 print("System Ready")
 print("="*80)
+
+# %%
+# Ablation Studies
+# Tests the contribution of each feature extraction branch
+# Updated for Main Model: Contrastive + GNN + Attention + Structured
+
+import numpy as np
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import (Input, Dense, Dropout, Concatenate, BatchNormalization,
+                                      MultiHeadAttention, LayerNormalization, GlobalAveragePooling1D,
+                                      Reshape, Conv1D, MaxPooling1D, Flatten, Add)
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.losses import CategoricalCrossentropy
+from tensorflow.keras import regularizers
+
+print("="*80)
+print("Ablation Studies - Testing Component Contributions")
+print("="*80)
+
+# Assumes you've already run the main code and have these variables:
+# X_contrastive_scaled, X_gnn_scaled, X_attention_scaled, X_structured
+# X_contrastive_scaled_test, X_gnn_scaled_test, X_attention_scaled_test, X_structured_test
+# y_train_cat, y_test_cat, num_classes
+
+l2_reg = regularizers.l2(0.015)
+
+def build_ablation_model(input_dims, input_names, num_classes):
+    """Build ablation model with appropriate architecture for each feature type"""
+    inputs = []
+    branches = []
+    
+    # Build branches based on feature type
+    for i, (dim, name) in enumerate(zip(input_dims, input_names)):
+        inp = Input(shape=(dim,), name=f'{name}_input')
+        inputs.append(inp)
+        
+        if 'attention' in name:
+            # Attention branch with Multi-Head Attention
+            att_reshaped = Reshape((1, dim))(inp)
+            att_mha = MultiHeadAttention(num_heads=4, key_dim=dim//4)(att_reshaped, att_reshaped)
+            att_mha = LayerNormalization()(att_mha)
+            att_pooled = GlobalAveragePooling1D()(att_mha)
+            x = Dense(64, activation='relu', kernel_regularizer=l2_reg)(att_pooled)
+            x = BatchNormalization()(x)
+            x = Dropout(0.45)(x)
+            
+        elif 'structured' in name:
+            # Structured branch with CNN
+            struct_reshaped = Reshape((dim, 1))(inp)
+            struct_conv = Conv1D(32, kernel_size=3, activation='relu', padding='same', 
+                                kernel_regularizer=l2_reg)(struct_reshaped)
+            struct_conv = Dropout(0.35)(struct_conv)
+            struct_pool = MaxPooling1D(pool_size=2)(struct_conv)
+            struct_conv2 = Conv1D(64, kernel_size=3, activation='relu', padding='same', 
+                                 kernel_regularizer=l2_reg)(struct_pool)
+            struct_flat = Flatten()(struct_conv2)
+            x = Dense(64, activation='relu', kernel_regularizer=l2_reg)(struct_flat)
+            x = Dropout(0.35)(x)
+            
+        else:
+            # Standard dense branch (contrastive, GNN)
+            x = Dense(128, activation='relu', kernel_regularizer=l2_reg)(inp)
+            x = BatchNormalization()(x)
+            x = Dropout(0.45)(x)
+            x = Dense(64, activation='relu', kernel_regularizer=l2_reg)(x)
+            x = Dropout(0.35)(x)
+        
+        branches.append(x)
+    
+    if len(branches) > 1:
+        merged = Concatenate()(branches)
+    else:
+        merged = branches[0]
+    
+    # Fusion layers
+    x = Dense(256, activation='relu', kernel_regularizer=l2_reg)(merged)
+    x = BatchNormalization()(x)
+    x = Dropout(0.55)(x)
+    x = Dense(128, activation='relu', kernel_regularizer=l2_reg)(x)
+    x = BatchNormalization()(x)
+    x = Dropout(0.45)(x)
+    
+    # Residual connection
+    fusion_skip = Dense(128, activation='relu', kernel_regularizer=l2_reg)(merged)
+    x = Add()([x, fusion_skip])
+    x = LayerNormalization()(x)
+    
+    x = Dense(64, activation='relu', kernel_regularizer=l2_reg)(x)
+    x = Dropout(0.3)(x)
+    output = Dense(num_classes, activation='softmax')(x)
+    
+    model = Model(inputs=inputs, outputs=output)
+    model.compile(
+        optimizer=Adam(learning_rate=5e-4),
+        loss=CategoricalCrossentropy(label_smoothing=0.2),
+        metrics=['accuracy']
+    )
+    return model
+
+# ==================== Test 1: Full Model ====================
+print("\n" + "-"*80)
+print("Test 1: Full Model (All Features)")
+print("-"*80)
+
+full_model = build_ablation_model(
+    [X_contrastive_scaled.shape[1], X_gnn_scaled.shape[1], 
+     X_attention_scaled.shape[1], X_structured.shape[1]],
+    ['contrastive', 'gnn', 'attention', 'structured'],
+    num_classes
+)
+
+full_model.fit(
+    [X_contrastive_scaled, X_gnn_scaled, X_attention_scaled, X_structured],
+    y_train_cat,
+    validation_split=0.2,
+    epochs=50,
+    batch_size=32,
+    verbose=0
+)
+
+_, full_acc = full_model.evaluate(
+    [X_contrastive_scaled_test, X_gnn_scaled_test, X_attention_scaled_test, X_structured_test],
+    y_test_cat,
+    verbose=0
+)
+
+print(f"Full Model Accuracy: {full_acc*100:.2f}%")
+
+# ==================== Test 2: Without Contrastive ====================
+print("\n" + "-"*80)
+print("Test 2: Without Contrastive Features")
+print("-"*80)
+
+model_no_contrastive = build_ablation_model(
+    [X_gnn_scaled.shape[1], X_attention_scaled.shape[1], X_structured.shape[1]],
+    ['gnn', 'attention', 'structured'],
+    num_classes
+)
+
+model_no_contrastive.fit(
+    [X_gnn_scaled, X_attention_scaled, X_structured],
+    y_train_cat,
+    validation_split=0.2,
+    epochs=50,
+    batch_size=32,
+    verbose=0
+)
+
+_, acc_no_contrastive = model_no_contrastive.evaluate(
+    [X_gnn_scaled_test, X_attention_scaled_test, X_structured_test],
+    y_test_cat,
+    verbose=0
+)
+
+print(f"Without Contrastive: {acc_no_contrastive*100:.2f}%")
+print(f"Drop: {(full_acc - acc_no_contrastive)*100:.2f}%")
+
+# ==================== Test 3: Without GNN ====================
+print("\n" + "-"*80)
+print("Test 3: Without GNN Features")
+print("-"*80)
+
+model_no_gnn = build_ablation_model(
+    [X_contrastive_scaled.shape[1], X_attention_scaled.shape[1], X_structured.shape[1]],
+    ['contrastive', 'attention', 'structured'],
+    num_classes
+)
+
+model_no_gnn.fit(
+    [X_contrastive_scaled, X_attention_scaled, X_structured],
+    y_train_cat,
+    validation_split=0.2,
+    epochs=50,
+    batch_size=32,
+    verbose=0
+)
+
+_, acc_no_gnn = model_no_gnn.evaluate(
+    [X_contrastive_scaled_test, X_attention_scaled_test, X_structured_test],
+    y_test_cat,
+    verbose=0
+)
+
+print(f"Without GNN: {acc_no_gnn*100:.2f}%")
+print(f"Drop: {(full_acc - acc_no_gnn)*100:.2f}%")
+
+# ==================== Test 4: Without Attention ====================
+print("\n" + "-"*80)
+print("Test 4: Without Attention Features")
+print("-"*80)
+
+model_no_attention = build_ablation_model(
+    [X_contrastive_scaled.shape[1], X_gnn_scaled.shape[1], X_structured.shape[1]],
+    ['contrastive', 'gnn', 'structured'],
+    num_classes
+)
+
+model_no_attention.fit(
+    [X_contrastive_scaled, X_gnn_scaled, X_structured],
+    y_train_cat,
+    validation_split=0.2,
+    epochs=50,
+    batch_size=32,
+    verbose=0
+)
+
+_, acc_no_attention = model_no_attention.evaluate(
+    [X_contrastive_scaled_test, X_gnn_scaled_test, X_structured_test],
+    y_test_cat,
+    verbose=0
+)
+
+print(f"Without Attention: {acc_no_attention*100:.2f}%")
+print(f"Drop: {(full_acc - acc_no_attention)*100:.2f}%")
+
+# ==================== Test 5: Without Structured ====================
+print("\n" + "-"*80)
+print("Test 5: Without Structured Features")
+print("-"*80)
+
+model_no_structured = build_ablation_model(
+    [X_contrastive_scaled.shape[1], X_gnn_scaled.shape[1], X_attention_scaled.shape[1]],
+    ['contrastive', 'gnn', 'attention'],
+    num_classes
+)
+
+model_no_structured.fit(
+    [X_contrastive_scaled, X_gnn_scaled, X_attention_scaled],
+    y_train_cat,
+    validation_split=0.2,
+    epochs=50,
+    batch_size=32,
+    verbose=0
+)
+
+_, acc_no_structured = model_no_structured.evaluate(
+    [X_contrastive_scaled_test, X_gnn_scaled_test, X_attention_scaled_test],
+    y_test_cat,
+    verbose=0
+)
+
+print(f"Without Structured: {acc_no_structured*100:.2f}%")
+print(f"Drop: {(full_acc - acc_no_structured)*100:.2f}%")
+
+# ==================== Summary ====================
+print("\n" + "="*80)
+print("Ablation Study Summary")
+print("="*80)
+
+results = [
+    ("Full Model", full_acc, 0),
+    ("Without Contrastive", acc_no_contrastive, full_acc - acc_no_contrastive),
+    ("Without GNN", acc_no_gnn, full_acc - acc_no_gnn),
+    ("Without Attention", acc_no_attention, full_acc - acc_no_attention),
+    ("Without Structured", acc_no_structured, full_acc - acc_no_structured)
+]
+
+print(f"\n{'Configuration':<25} {'Accuracy':<12} {'Drop':<10}")
+print("-"*80)
+for config, acc, drop in results:
+    print(f"{config:<25} {acc*100:>6.2f}%      {drop*100:>6.2f}%")
+
+# Find most important component
+drops = [(name, drop) for name, _, drop in results[1:]]
+most_important = max(drops, key=lambda x: x[1])
+
+print(f"\nMost important component: {most_important[0]} (drop: {most_important[1]*100:.2f}%)")
+
+# Save results
+with open('ablation_results.txt', 'w', encoding='utf-8') as f:
+    f.write("Ablation Study Results\n")
+    f.write("="*80 + "\n\n")
+    f.write(f"{'Configuration':<25} {'Accuracy':<12} {'Drop':<10}\n")
+    f.write("-"*80 + "\n")
+    for config, acc, drop in results:
+        f.write(f"{config:<25} {acc*100:>6.2f}%      {drop*100:>6.2f}%\n")
+    f.write(f"\nMost important: {most_important[0]} (drop: {most_important[1]*100:.2f}%)\n")
+
+print("\nResults saved to 'ablation_results.txt'")
+
+
+# %%
+
+
+
