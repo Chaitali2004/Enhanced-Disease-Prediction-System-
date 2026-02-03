@@ -1,0 +1,34 @@
+
+================================================================================
+                    Disease Prediction System
+                        Performance Summary
+================================================================================
+
+Dataset Statistics:
+  Disease Classes:     41
+  Training Samples:    3444
+  Test Samples:        1476
+  Feature Dimension:   342D
+
+Model Architecture:
+  Total Parameters:    342,785
+  Branches:            4 (Contrastive, GNN, Attention, Structured)
+  Pre-training:        30 epochs (NT-Xent loss)
+  Graph Network:       3-layer GAT with 4 attention heads
+  Fusion:              Multi-modal with residual connections
+
+Performance Metrics:
+  Test Accuracy:       98.58%
+  Top-3 Accuracy:      99.80%
+  Top-5 Accuracy:      99.80%
+  Weighted Precision:  98.76%
+  Weighted Recall:     98.58%
+  Weighted F1-Score:   98.60%
+
+Key Features:
+  - Self-supervised contrastive pre-training
+  - Graph attention networks with body system knowledge
+  - Multi-level hierarchical attention (word + phrase)
+  - Multi-modal feature fusion
+
+================================================================================
